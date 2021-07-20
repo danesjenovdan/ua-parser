@@ -2,7 +2,7 @@
 echo "parse sessions"
 scrapy crawl speeches
 echo "parse votes"
-python parlaparser/data_parser/vote_parser.py
+python vote_parser.py
 cd /app
 echo "set session to votes"
 python manage.py set_session_to_votes_ua

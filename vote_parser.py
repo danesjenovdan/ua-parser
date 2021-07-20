@@ -105,7 +105,6 @@ class VoteParser(BaseParser):
 
                 for voter_result in vote['results'].split('|'):
                     mp_id, org_id, option = voter_result.split(':')
-                    logging.warning(mp_id)
                     option = OPTIONS[option]
                     person_id, added_person = self.data_storage.get_or_add_person(
                         str(mp_id)
