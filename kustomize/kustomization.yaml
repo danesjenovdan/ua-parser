@@ -6,4 +6,4 @@ resources:
 images:
   - name: parlaparser-ukraine
     newName: rg.fr-par.scw.cloud/djnd/parlaparser-ukraine
-    newTag: 'latest'
+    newTag: '723187caa92147aedefee63ba17492c2e5b4386d'
