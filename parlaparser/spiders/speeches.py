@@ -45,7 +45,7 @@ class SpeechesSpider(scrapy.Spider):
 
     def parse(self, response):
         chairman_row = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[3]
-        sitting = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[0]
+        sitting = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[0].strip()
         date = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[2]
 
         cyrillic_all_caps_words = r'[\sАБВГҐДЂЃЕЁЄЖЅЗИІЇЙЈКЛЉМНЊОПРСТЋЌУЎФХЦЧЏШЩЪЫЬЭЮЯ.]+$'
