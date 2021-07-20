@@ -1,0 +1,4 @@
+editdistance
+ipython
+Scrapy
+requests
