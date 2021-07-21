@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from collections import OrderedDict
 
 from parlaparser import settings
 
 import scrapy
 import re
-import logging
 import requests
 import json
 
@@ -28,10 +28,18 @@ class SpeechesSpider(scrapy.Spider):
             self.data = json.load(data_file)
 
     def start_requests(self):
-        for month in range(12):
-            url = f'https://data.rada.gov.ua/ogd/zal/agenda/skl9/stenogram-20210{month+1}.json'
+        end = datetime.now()
+        months = OrderedDict(((settings.MANDATE_STARTIME + timedelta(_)).strftime(r"%Y%m"), None) for _ in range((end - settings.MANDATE_STARTIME).days)).keys()
+        for month in months:
+            url = f'https://data.rada.gov.ua/ogd/zal/agenda/skl9/stenogram-{month}.json'
             print(url)
-            response = requests.get(url)
+            try:
+                response = requests.get(url)
+            except:
+                continue
+            if response.status_code >= 400:
+                print(f'[ERROR] Got status code {response.status_code} from {url}')
+                continue
             with open(f'parlaparser/files/session.json', 'wb') as f:
                 f.write(response.content)
             with open('parlaparser/files/session.json') as data_file:
@@ -41,6 +49,11 @@ class SpeechesSpider(scrapy.Spider):
                         request = scrapy.Request(item['url'], callback=self.parse)
                         request.meta['item'] = item
                         yield request
+                    if 'urls' in item.keys():
+                        for speeches_url in item['urls']:
+                            request = scrapy.Request(speeches_url, callback=self.parse)
+                            request.meta['item'] = item
+                            yield request
 
 
     def parse(self, response):
@@ -72,7 +85,9 @@ class SpeechesSpider(scrapy.Spider):
         for paragraph_dom in response.css(".MsoNormal")[5:]:
             center_paragraf = paragraph_dom.css("[align=center]::text")
 
-            paragraph = paragraph_dom.css("::text").extract_first().strip()
+            paragraph = paragraph_dom.css("::text").extract_first()
+            if paragraph:
+                paragraph = paragraph.strip()
 
             if center_paragraf:
                 if re.match(cyrillic_chars, paragraph):
