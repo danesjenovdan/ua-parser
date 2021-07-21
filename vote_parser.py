@@ -45,6 +45,16 @@ voter_result example
 class VoteParser(BaseParser):
     def __init__(self, data_storage):
         super().__init__(data_storage)
+        url = 'https://data.rada.gov.ua/ogd/zal/ppz/skl9/plenary_event_question-skl9.csv'
+        response = requests.get(url)
+        with open(f'parlaparser/files/plenary_event_question-skl9.csv', 'wb') as f:
+            f.write(response.content)
+
+        url = 'https://data.rada.gov.ua/ogd/zal/ppz/skl9/plenary_vote_results-skl9.tsv'
+        response = requests.get(url)
+        with open(f'parlaparser/files/plenary_vote_results-skl9.tsv', 'wb') as f:
+            f.write(response.content)
+
         results = csv.DictReader(
             open("parlaparser/files/plenary_vote_results-skl9.tsv"),
             delimiter='\t',
