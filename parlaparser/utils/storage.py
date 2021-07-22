@@ -103,7 +103,7 @@ class DataStorage(object):
         return (vote['name']).strip().lower()
 
     def get_motion_key(self, motion):
-        return (str(motion['session']) + motion['datetime']).strip().lower()
+        return (motion['datetime']).strip().lower()
 
     def get_question_key(self, question):
         return (question['title'] + question['timestamp']).strip().lower()
