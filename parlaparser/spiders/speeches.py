@@ -56,23 +56,40 @@ class SpeechesSpider(scrapy.Spider):
                             yield request
 
 
-    def parse(self, response):
-        chairman_row = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[3]
-        sitting = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[0].strip()
-        date = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[2]
-
+    def parse_session_metadata(self, response):
+        lines = ['sitting_name', 'location', 'date', 'chairman']
         cyrillic_all_caps_words = r'[\sАБВГҐДЂЃЕЁЄЖЅЗИІЇЙЈКЛЉМНЊОПРСТЋЌУЎФХЦЧЏШЩЪЫЬЭЮЯ.]+$'
+        idx = 0
+        rows = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()
+        output = {}
+        for row in rows:
+            row = row.strip()
 
-        # find chairman line
-        chairman = re.search(cyrillic_all_caps_words, chairman_row)
-        if chairman:
-            chairman = chairman[0].strip()
-        else:
-            chairman = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()[4].strip()
+            if lines[idx] == 'chairman':
+                row = re.search(cyrillic_all_caps_words, row)
+                if row:
+                    row = row[0].strip()
+
+            if not row:
+                continue
+
+            output[lines[idx]] = row
+            idx += 1
+
+            if idx > 3:
+                break
+
+        return output
+
+
+    def parse(self, response):
+        metadata = self.parse_session_metadata(response)
+        chairman = metadata['chairman']
+        sitting = metadata['sitting_name']
 
         date = response.css(".date::text").extract_first().strip()
 
-        self.time = None
+        self.time = '00:00:00'
         self.speaker = None
         self.content = ''
         self.speeches = []
@@ -81,6 +98,8 @@ class SpeechesSpider(scrapy.Spider):
         time_regex = r'([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$'
 
         cyrillic_chars = r'^[\sАБВГҐДЂЃЕЁЄЖЅЗИІЇЙЈКЛЉМНЊОПРСТЋЌУЎФХЦЧЏШЩЪЫЬЭЮЯ.]+$'
+
+        cyrillic_uppercase_start_person = r'(^[АБВГҐДЂЃЕЁЄЖЅЗИІЇЙЈКЛЉМНЊОПРСТЋЌУЎФХЦЧЏШЩЪЫЬЭЮЯ. ]{8,}\s)'
 
         for paragraph_dom in response.css(".MsoNormal")[5:]:
             center_paragraf = paragraph_dom.css("[align=center]::text")
@@ -114,6 +133,12 @@ class SpeechesSpider(scrapy.Spider):
                 if self.content:
                     self.add_speech()
                 self.speaker = paragraph
+            # if is special paragraph with which starts with speker without time in the same paragraf of content
+            elif re.match(cyrillic_uppercase_start_person, paragraph):
+                if self.content:
+                    self.add_speech()
+                self.speaker = re.match(cyrillic_uppercase_start_person, paragraph)[0].strip()
+                self.content = paragraph[len(self.speaker):].strip()
             else:
                 self.content += ' ' + paragraph
 
