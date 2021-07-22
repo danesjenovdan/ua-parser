@@ -5,7 +5,6 @@ from enum import Enum
 from collections import Counter
 from datetime import datetime, timedelta
 
-import logging
 import re
 import csv
 import requests
@@ -104,6 +103,9 @@ class VoteParser(BaseParser):
                     'timestamp': start_time.isoformat(),
                     'result': result
                 }
+
+                if self.data_storage.check_if_motion_is_parsed(new_motion):
+                    continue
 
                 if not 'results' in vote.keys():
                     continue
