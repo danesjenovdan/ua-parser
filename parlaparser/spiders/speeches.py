@@ -60,7 +60,7 @@ class SpeechesSpider(scrapy.Spider):
         lines = ['sitting_name', 'location', 'date', 'chairman']
         cyrillic_all_caps_words = r'[\sАБВГҐДЂЃЕЁЄЖЅЗИІЇЙЈКЛЉМНЊОПРСТЋЌУЎФХЦЧЏШЩЪЫЬЭЮЯ.]+$'
         idx = 0
-        rows = response.css(".MsoNormal[align=center] span::text, .MsoNormal[align=center]::text").extract()
+        rows = response.css(".sten_item_content > .MsoNormal[align=center] span::text, .sten_item_content > .MsoNormal[align=center]::text, .sten_item_content > div[align=center]::text").extract()
         output = {}
         for row in rows:
             row = row.strip()

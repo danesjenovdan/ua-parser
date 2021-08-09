@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "parse people"
-scrapy crawl people
+python people_parser.py
 echo "parse speeches"
 scrapy crawl speeches
 echo "parse votes"
