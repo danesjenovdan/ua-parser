@@ -37,8 +37,6 @@ class PeopleParser(BaseParser):
         with open(f'parlaparser/files/mps09-data.csv', 'wb') as f:
             f.write(response.content)
 
-
-
         posts_ids = csv.DictReader(
             open("parlaparser/files/mp-posts_ids.csv"),
             delimiter=',',
@@ -64,9 +62,6 @@ class PeopleParser(BaseParser):
 
         for id, mp in mps_data.items():
             if id in posts_ids.keys():
-                print(mps_data[id])
-                print(posts_ids[id])
-                print()
                 mps_data[id].update(posts_ids[id])
                 mps_data[id]['fraction'] = post_unit[mp['unit_id']]
             else:
@@ -79,8 +74,6 @@ class PeopleParser(BaseParser):
                 end_time = datetime.strptime(data['date_end'], '%d.%m.%Y').isoformat()
             else:
                 end_time = None
-
-            print(data)
 
             organization_id, added_org = data_storage.get_or_add_organization(
                 data['fraction'],
@@ -134,6 +127,59 @@ class PeopleParser(BaseParser):
                         'role': 'voter'
                     }
                 )
+            else:
+                if not added_org:
+                    if person_id in data_storage.memberships[organization_id].keys():
+                        # membership for this person already exists
+                        member_membership = self.find_membership(data_storage.memberships[organization_id][person_id], start_time)
+                        voter_membership = self.find_membership(data_storage.memberships[int(data_storage.main_org_id)][person_id], start_time)
+                        # check if membership is up to date
+                        if member_membership['end_time'] != end_time:
+                            # update membership
+                            print('UPDATE !!!!!!!!!!!!!!!!!')
+                            print(data)
+                            data_storage.patch_memberships(
+                                member_membership['id'],
+                                {
+                                    'end_time': end_time
+                                }
+                            )
+                            data_storage.patch_memberships(
+                                voter_membership['id'],
+                                {
+                                    'end_time': end_time
+                                }
+                            )
+                        else:
+                            print('nothing for update')
+
+                    else:
+                        # membership for person in this organization does not exists
+                        data_storage.add_membership(
+                            {
+                                'member': person_id,
+                                'organization': organization_id,
+                                'on_behalf_of': None,
+                                'start_time': start_time,
+                                'end_time': end_time,
+                                'role': 'member'
+                            }
+                        )
+                        data_storage.add_membership(
+                            {
+                                'member': person_id,
+                                'organization': data_storage.main_org_id,
+                                'on_behalf_of': organization_id,
+                                'start_time': start_time,
+                                'end_time': end_time,
+                                'role': 'voter'
+                            }
+                        )
+    def find_membership(self, memberships, start_time):
+        for membership in memberships:
+            if membership['start_time'] == start_time:
+                return membership
+
 
 
 if __name__ == "__main__":

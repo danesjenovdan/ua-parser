@@ -80,8 +80,15 @@ class ParladataApi(object):
     def get_legislation(self):
         return self._get_objects('legislation')
 
-    def get_memberships(self):
-        return self._get_objects('person-memberships/?role=voter')
+    def get_memberships(self, role=None):
+        if role:
+            role = f'?role=role'
+        else:
+            role = ''
+        return self._get_objects(f'person-memberships/{role}')
+
+    def patch_memberships(self, id, data):
+        return self._patch_object(f'person-memberships/{id}', data).json()
 
     def get_speeches(self, id='', session=None):
         query = []
