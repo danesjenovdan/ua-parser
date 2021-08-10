@@ -92,9 +92,10 @@ class DataStorage(object):
 
     
         logging.debug(self.people.keys())
-
-        for membership in self.parladata_api.get_memberships():
+        api_memberships = self.parladata_api.get_memberships()
+        for membership in api_memberships:
             self.memberships[membership['organization']][membership['member']].append(membership)
+        logging.warning(f'loaded {len(api_memberships)} memberships')
 
 
     def get_vote_key(self, vote):
@@ -233,6 +234,9 @@ class DataStorage(object):
 
     def patch_vote(self, id, data):
         self.parladata_api.patch_vote(id, data)
+
+    def patch_memberships(self, id, data):
+        self.parladata_api.patch_memberships(id, data)
 
     def set_legislation(self, data):
         added_legislation = self.parladata_api.set_legislation(data)
