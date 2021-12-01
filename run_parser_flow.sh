@@ -18,5 +18,7 @@ echo "run analysis for today"
 python manage.py daily_update
 echo "update speeches to solr"
 python manage.py upload_speeches_to_solr
+echo "update votes to solr"
+python manage.py upload_votes_to_solr
 echo "send notifications"
 python manage.py send_daily_notifications
