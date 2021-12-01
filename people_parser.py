@@ -98,7 +98,7 @@ class PeopleParser(BaseParser):
                 {
                     'name': data['full_name'],
                     'parser_names': parser_name,
-                    'birth_date': datetime.strptime(data['birthday'], '%d.%m.%Y').isoformat(),
+                    'date_of_birth': datetime.strptime(data['birthday'], '%d.%m.%Y').isoformat(),
                 }
             )
             if added_person:

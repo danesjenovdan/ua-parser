@@ -45,7 +45,7 @@ class PersonParser(BaseParser):
             {
                 'name': data['full_name'],
                 'parser_names': parser_name,
-                'birth_date': datetime.strptime(data['birthday'], '%d.%m.%Y').isoformat(),
+                'date_of_birth': datetime.strptime(data['birthday'], '%d.%m.%Y').date().isoformat(),
             }
         )
         if added_person:
@@ -74,6 +74,17 @@ class PersonParser(BaseParser):
                     'role': 'voter'
                 }
             )
+        else:
+            pass
+            # update people
+            # edit fields for update
+            # data_storage.patch_person(
+            #     person_id,
+            #     {
+            #         'date_of_birth': datetime.strptime(data['birthday'], '%d.%m.%Y').date().isoformat(),
+            #     }
+            # )
+
             # TODO save image
             # data_storage.parladata_api.upload_image(
             #     f'people/{person_id}',
