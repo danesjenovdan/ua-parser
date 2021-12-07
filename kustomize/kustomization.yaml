@@ -6,4 +6,4 @@ resources:
 images:
   - name: parlaparser-ua
     newName: rg.fr-par.scw.cloud/djnd/parlaparser-ua
-    newTag: 'b8182d7c0a807fc7b4b5108aa0c2ea6f4bcecc66'
+    newTag: 'cbae76b772a4caf2dd70764a7e81a190813c56b3'
