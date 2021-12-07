@@ -12,8 +12,8 @@ echo "lematize speeches"
 python manage.py lemmatize_speeches
 echo "set tfidf"
 python manage.py set_tfidf_for_sessions
-echo "start setting motion tags"
-python manage.py set_motion_tags
+#echo "start setting motion tags"
+#python manage.py set_motion_tags
 echo "run analysis for today"
 python manage.py daily_update
 echo "update speeches to solr"
