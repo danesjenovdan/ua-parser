@@ -2,6 +2,7 @@ from parlaparser.data_parsers.base_parser import BaseParser
 from parlaparser import settings
 from enum import Enum
 from datetime import datetime
+from babel.dates import format_date
 
 import logging
 import re
@@ -28,8 +29,11 @@ class SpeechesParser(BaseParser):
 
         start_time = datetime.strptime(data['date'], "%d %B %Y")
 
+        ua_date = format_date(start_time, format='d MMMM YYYY', locale='uk')
+        sitting_name = f'ЗАСІДАННЯ, {ua_date}'
+
         session_id = self.data_storage.add_or_get_session({
-            'name': data['sitting'],
+            'name': sitting_name,
             'organization': self.data_storage.main_org_id,
             'organizations': [self.data_storage.main_org_id],
             'start_time': start_time.isoformat()

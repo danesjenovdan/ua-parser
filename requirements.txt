@@ -2,3 +2,4 @@ editdistance
 ipython
 Scrapy
 requests
+Babel
