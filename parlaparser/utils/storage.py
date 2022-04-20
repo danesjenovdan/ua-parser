@@ -238,6 +238,9 @@ class DataStorage(object):
     def patch_memberships(self, id, data):
         self.parladata_api.patch_memberships(id, data)
 
+    def patch_person(self, id, data):
+        self.parladata_api.patch_person(id, data)
+
     def set_legislation(self, data):
         added_legislation = self.parladata_api.set_legislation(data)
         return added_legislation

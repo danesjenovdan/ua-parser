@@ -101,6 +101,9 @@ class ParladataApi(object):
     def set_person(self, data):
         return self._set_object('people', data)
 
+    def patch_person(self, id, data):
+        return self._patch_object(f'people/{id}', data).json()
+
     def set_organization(self, data):
         return self._set_object('organizations', data)
 
