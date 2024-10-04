@@ -22,72 +22,59 @@ class PersonParser(BaseParser):
         super().__init__(data_storage)
         data = data
 
-        organization_id, added_org = data_storage.get_or_add_organization(
-            data['party_name'],
+        organization = data_storage.organization_storage.get_or_add_object(
             {
                 'name': data['party_name'],
                 'parser_names': data['party_name'],
                 'classification': 'pg'
             }
         )
-        if added_org:
-            data_storage.add_org_membership(
+        if organization.is_new:
+            data_storage.organization_membership_storage.get_or_add_object(
                 {
-                    'member': organization_id,
-                    'organization': data_storage.main_org_id
+                    'member': organization.id,
+                    'organization': data_storage.main_org_id,
+                    'mandate': data_storage.mandate_id,
                 }
             )
 
         parser_name = f'{data["last_name"]} {data["short_name"]}|{data["full_name"]}|{data["rada_id"]}'
 
-        person_id, added_person = data_storage.get_or_add_person(
-            data['full_name'],
+        person = data_storage.person_storage.get_or_add_object(
             {
                 'name': data['full_name'],
                 'parser_names': parser_name,
                 'date_of_birth': datetime.strptime(data['birthday'], '%d.%m.%Y').date().isoformat(),
             }
         )
-        if added_person:
+        if person.is_new:
             start_time = datetime.strptime(data['date_begin'], '%d.%m.%Y').isoformat()
             if data['date_end']:
                 end_time = datetime.strptime(data['date_end'], '%d.%m.%Y').isoformat()
             else:
                 end_time = None
-            data_storage.add_membership(
+            data_storage.membership_storage.get_or_add_object(
                 {
-                    'member': person_id,
-                    'organization': organization_id,
+                    'member': person.id,
+                    'organization': organization.id,
                     'on_behalf_of': None,
                     'start_time': start_time,
                     'end_time': end_time,
-                    'role': data['role'] if data['role'] else 'member'
+                    'role': data['role'] if data['role'] else 'member',
+                    'mandate': data_storage.mandate_id
                 }
             )
-            data_storage.add_membership(
+            data_storage.membership_storage.get_or_add_object(
                 {
-                    'member': person_id,
+                    'member': person.id,
                     'organization': data_storage.main_org_id,
-                    'on_behalf_of': organization_id,
+                    'on_behalf_of': organization.id,
                     'start_time': start_time,
                     'end_time': end_time,
-                    'role': 'voter'
+                    'role': 'voter',
+                    'mandate': data_storage.mandate_id
                 }
             )
         else:
             pass
-            # update people
-            # edit fields for update
-            # data_storage.patch_person(
-            #     person_id,
-            #     {
-            #         'date_of_birth': datetime.strptime(data['birthday'], '%d.%m.%Y').date().isoformat(),
-            #     }
-            # )
 
-            # TODO save image
-            # data_storage.parladata_api.upload_image(
-            #     f'people/{person_id}',
-            #     data['photo']
-            # )
-            # TODO add gender

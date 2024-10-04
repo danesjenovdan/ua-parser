@@ -1,9 +1,6 @@
 from parlaparser.data_parsers.base_parser import BaseParser
-from parlaparser import settings
 from parlaparser.utils.storage import DataStorage
-from enum import Enum
-from collections import Counter
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import re
 import csv
@@ -104,30 +101,29 @@ class VoteParser(BaseParser):
                     'result': result
                 }
 
-                if self.data_storage.check_if_motion_is_parsed(new_motion):
+                if self.data_storage.vote_storage.check_if_motion_is_parsed(new_motion):
                     continue
 
                 if not 'results' in vote.keys():
                     continue
-                motion_obj = self.data_storage.set_motion(new_motion)
-                new_vote['motion'] = motion_obj['id']
-                vote_obj = self.data_storage.set_vote(new_vote)
+
+                motion = self.data_storage.vote_storage.get_or_add_object(new_motion)
 
                 ballots = []
 
                 for voter_result in vote['results'].split('|'):
                     mp_id, org_id, option = voter_result.split(':')
                     option = OPTIONS[option]
-                    person_id, added_person = self.data_storage.get_or_add_person(
+                    person = self.data_storage.person_storage.get_or_add_object(
                         str(mp_id)
                     )
                     ballots.append({
-                        'vote': vote_obj['id'],
+                        'vote': motion.vote.id,
                         'option': option,
-                        'personvoter': person_id,
+                        'personvoter': person.id,
                     })
 
-                self.data_storage.set_ballots(ballots)
+                self.data_storage.vote_storage.set_ballots(ballots)
 
 
 if __name__ == "__main__":

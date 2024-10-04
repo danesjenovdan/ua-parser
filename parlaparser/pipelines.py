@@ -10,6 +10,7 @@ from itemadapter import ItemAdapter
 from parlaparser.utils.storage import DataStorage
 from parlaparser.data_parsers.person_parser import PersonParser
 from parlaparser.data_parsers.speeches_parser import SpeechesParser
+from settings import MANDATE, MANDATE_STARTIME, MAIN_ORG_ID, API_URL, API_AUTH
 
 import logging
 
@@ -18,11 +19,13 @@ class ParlaparserPipeline:
     def __init__(self, *args, **kwargs):
         super(ParlaparserPipeline, self).__init__(*args, **kwargs)
         logging.warning('........::Start parser:........')
-        self.data_storage = DataStorage()
+        self.storage = DataStorage(
+            MANDATE, MANDATE_STARTIME, MAIN_ORG_ID, API_URL, API_AUTH[0], API_AUTH[1]
+        )
 
     def process_item(self, item, spider):
         if item['type'] == 'person':
-            PersonParser(item, self.data_storage)
+            PersonParser(item, self.storage)
         elif item['type'] == 'speeches':
-            SpeechesParser(item, self.data_storage)
+            SpeechesParser(item, self.storage)
         return ''
