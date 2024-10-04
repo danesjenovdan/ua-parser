@@ -3,3 +3,4 @@ ipython
 Scrapy
 requests
 Babel
+parladata-base-api==0.1.8
