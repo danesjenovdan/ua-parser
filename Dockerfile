@@ -1,4 +1,4 @@
-FROM rg.fr-par.scw.cloud/djnd/parladata-ua:latest
+FROM rg.fr-par.scw.cloud/djnd/parladata-ukrajina:latest
 
 RUN apt-get update && \
     apt-get upgrade -y && \

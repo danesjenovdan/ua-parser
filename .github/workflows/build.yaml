@@ -22,12 +22,12 @@ jobs:
           username: nologin
           password: ${{ secrets.SCW_SECRET_TOKEN }}
       -
-        name: Build and push parlaparser-ua
+        name: Build and push parlaparser-ukrajina
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: rg.fr-par.scw.cloud/djnd/parlaparser-ua:${{ github.sha }}
+          tags: rg.fr-par.scw.cloud/djnd/parlaparser-ukrajina:${{ github.sha }}
       -
         name: Update image versions in kustomize/kustomization.yaml
         run: |
